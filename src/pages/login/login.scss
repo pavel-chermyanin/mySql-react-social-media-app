@@ -1,16 +1,22 @@
 .login {
-  height: 100vh;
+  min-height: 100vh;
   background-color: rgb(193, 190, 255);
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 0 10px;
   .card {
-    width: 50%;
+    
+    width: 100%;
+    max-width: 600px;
     display: flex;
     background-color: #fff;
     border-radius: 10px;
     min-height: 400px;
     overflow: hidden;
+    @media(max-width:520px) {
+      flex-direction: column;
+    }
     .left {
       flex: 1;
       background: linear-gradient(
@@ -52,6 +58,7 @@
       flex-direction: column;
       justify-content: center;
       gap: 30px;
+      
       h1 {
         color: #555;
       }
