@@ -7,6 +7,7 @@ import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import MenuOpenOutlinedIcon from "@mui/icons-material/MenuOpenOutlined";
 import { Link } from "react-router-dom";
 import { DarkModeContext } from "../../context/darkModeContext";
 import { useContext, useEffect, useState } from "react";
@@ -15,7 +16,8 @@ import { useRef } from "react";
 
 const Navbar = () => {
   const { darkMode, toggle } = useContext(DarkModeContext);
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, isOpenLeftbar, setIsOpenLeftbar } =
+    useContext(AuthContext);
 
   const [isDropMenu, setDropMenu] = useState(false);
   const [isSearchMobile, setSearchMobile] = useState(false);
@@ -35,8 +37,8 @@ const Navbar = () => {
         !activeDrop?.current?.contains(e.target) &&
         !dropMenuRef?.current?.contains(e.target)
       ) {
-       setDropMenu(false);
-      } 
+        setDropMenu(false);
+      }
     };
     window.addEventListener("click", handleMenuDrop);
 
@@ -56,8 +58,16 @@ const Navbar = () => {
         {!isSearchMobile && (
           <>
             <Link to="/" style={{ textDecoration: "none" }}>
-              <span>pavelsocial</span>
+              <span>paveldev</span>
             </Link>
+            <div className="burger">
+              <MenuOpenOutlinedIcon
+                onClick={(e) => {
+                  // e.stopPropagation();
+                  setIsOpenLeftbar((prev) => !prev);
+                }}
+              />
+            </div>
             <HomeOutlinedIcon />
             {darkMode ? (
               <WbSunnyOutlinedIcon onClick={toggle} />

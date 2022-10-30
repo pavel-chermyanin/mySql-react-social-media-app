@@ -9,6 +9,21 @@
     overflow: auto;
     background-color: themed("bg");
     color: themed("textColor");
+    transition: all .3s ease-in-out;
+    
+
+    @media (max-width: 768px) {
+      position: absolute;
+      z-index: 1;
+      -webkit-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.39);
+      -moz-box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.39);
+      box-shadow: 0px 0px 15px 1px rgba(0, 0, 0, 0.39);
+      transform: translateX(-150%);
+    }
+
+    // @include mobile {
+    //   display: none;
+    // }
 
     &::-webkit-scrollbar {
       display: none;
@@ -20,7 +35,7 @@
         margin: 20px 0;
         border: none;
         height: 0.5px;
-        background-color: themed('border');
+        background-color: themed("border");
       }
 
       .menu {

@@ -7,6 +7,8 @@ export const AuthContextProvider = ({ children }) => {
     JSON.parse(localStorage.getItem("user")) || null
   );
 
+  const [isOpenLeftbar, setIsOpenLeftbar] = useState(false)
+
   const login = () => {
     setCurrentUser({
       id: "1",
@@ -20,11 +22,16 @@ export const AuthContextProvider = ({ children }) => {
     localStorage.setItem("user", JSON.stringify(currentUser));
   }, [currentUser]);
 
+
+
+
   return (
     <AuthContext.Provider
       value={{
         currentUser,
         login,
+        isOpenLeftbar,
+        setIsOpenLeftbar,
       }}
     >
       {children}

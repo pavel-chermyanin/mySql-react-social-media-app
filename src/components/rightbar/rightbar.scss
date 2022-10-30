@@ -10,6 +10,13 @@
     background-color: themed("bgSoft");
     color: themed("textColor");
 
+    @include mobile {
+      display: none;
+    }
+    @media (max-width: 1200px) {
+      display: none;
+    }
+
     &::-webkit-scrollbar {
       display: none;
     }
@@ -33,9 +40,8 @@
           justify-content: space-between;
           margin: 20px 0;
           span {
-              align-self: end;
-              
-            }
+            align-self: end;
+          }
 
           .userInfo {
             display: flex;
@@ -60,12 +66,12 @@
             p {
               display: flex;
               flex-direction: column;
-              color: themed('textColorSoft');
+              color: themed("textColorSoft");
             }
             span {
               align-self: start;
               font-weight: 500;
-              color: themed('textColor');
+              color: themed("textColor");
             }
           }
           .buttons {

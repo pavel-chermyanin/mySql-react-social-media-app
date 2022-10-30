@@ -8,12 +8,16 @@ import { Outlet, Navigate } from "react-router-dom";
 import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
 import "./app.scss";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";
 
 function App() {
-  const {currentUser} = useContext(AuthContext);
+  useEffect(() => {
+    localStorage.removeItem("scroll");
+  }, []);
+
+  const { currentUser } = useContext(AuthContext);
 
   const { darkMode, toggle } = useContext(DarkModeContext);
 

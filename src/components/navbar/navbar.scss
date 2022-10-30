@@ -29,9 +29,19 @@
     .left {
       display: flex;
       align-items: center;
-      gap: 30px;
+      gap: 25px;
       flex: 1;
       min-width: 200px;
+
+      .burger{
+        display: none;
+        flex-direction: column;
+        justify-content: flex-end;
+
+        @media(max-width:768px) {
+          display: flex;
+        }
+      }
 
       .mobile-search {
         display: none;
@@ -58,8 +68,8 @@
       @media (max-width: 450px) {
         gap: 20px;
       }
-      @media (max-width: 350px) {
-        gap: 15px;
+      @media (max-width: 360px) {
+        gap: 10px;
       }
       span {
         font-weight: 700;

@@ -13,12 +13,50 @@ import Tutorials from "../../assets/11.png";
 import Courses from "../../assets/12.png";
 import Fund from "../../assets/13.png";
 import { AuthContext } from "../../context/authContext";
-import { useContext } from "react";
+import { useContext, useEffect, useRef } from "react";
 
 const Leftbar = () => {
-  const { currentUser } = useContext(AuthContext);
+  const { currentUser, isOpenLeftbar, setIsOpenLeftbar } =
+    useContext(AuthContext);
+  const leftbarRef = useRef();
+
+  useEffect(() => {
+    if (isOpenLeftbar) {
+      leftbarRef.current.focus()
+    }
+
+  }, [isOpenLeftbar]);
+
+  useEffect(() => {
+    window.addEventListener("resize", () => setIsOpenLeftbar(false));
+
+    return () =>
+      window.removeEventListener("resize", () => setIsOpenLeftbar(false));
+  }, []);
+
+  const handleTranslate = () => {
+    leftbarRef.current.style.transform = "translateX(-150%)";
+  };
+
+  const handleOnBlur = () => {
+    isOpenLeftbar && handleTranslate();
+    setTimeout(() => {
+      setIsOpenLeftbar(false);
+    }, 30);
+  };
   return (
-    <div className="leftbar">
+    <div
+      className="leftbar"
+      ref={leftbarRef}
+      tabIndex={1}
+      // style={{
+      //   transform: isOpenLeftbar && "translateX(0)",
+      // }}
+      onFocus={(e) => {
+        leftbarRef.current.style.transform = "translateX(0)";
+      }}
+      onBlur={handleOnBlur}
+    >
       <div className="container">
         <div className="menu">
           <div className="user">
