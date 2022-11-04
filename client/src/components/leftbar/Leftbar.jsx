@@ -14,53 +14,88 @@ import Courses from "../../assets/12.png";
 import Fund from "../../assets/13.png";
 import { AuthContext } from "../../context/authContext";
 import { useContext, useEffect, useRef } from "react";
+import { setOpenLeftbar } from "../../store/openLeftbar";
+import { useDispatch, useSelector } from "react-redux";
+import { useMediaQuery } from "react-responsive";
 
 const Leftbar = () => {
-  const { currentUser, isOpenLeftbar, setIsOpenLeftbar } =
-    useContext(AuthContext);
+  const { currentUser } = useContext(AuthContext);
   const leftbarRef = useRef();
+  const { isOpenLeftbar } = useSelector((state) => state.openLeftbar);
+  const dispatch = useDispatch();
 
+  const isBigScreen = useMediaQuery({ query: "(min-width: 768px)" });
+  const isSmallScreen = useMediaQuery({ query: "(max-width: 767px)" });
+
+  // if (isSmallScreen) {
+  //   dispatch(setOpenLeftbar(false));
+  //   console.log("less 768px");
+  // }
+  // if (isSmallScreen) {
+  //   dispatch(setOpenLeftbar(false));
+  //   console.log("less 768px");
+  // }
+  // console.log(isOpenLeftbar);
   useEffect(() => {
-    if (isOpenLeftbar) {
-      leftbarRef.current.focus()
-    }
-
+    // leftbarRef.current.focus();
+    // dispatch(() => setOpenLeftbar(true));
+    // leftbarRef.current.style.transform = "translateX(-150%)";
   }, [isOpenLeftbar]);
 
   useEffect(() => {
-    window.addEventListener("resize", () => setIsOpenLeftbar(false));
+    const handleClick = (e) => {
+      if (!leftbarRef.current.contains(e.target)) {
+        dispatch(setOpenLeftbar(false));
+      }
+    };
+    window.addEventListener("click", handleClick);
+    
+    return () => window.removeEventListener("click", handleClick);
+  }, []);
+  
+  useEffect(() => {
+    const handleResize = (e) => {
+      console.log("!");
+      // if(isOpenLeftbar) {
+        dispatch(setOpenLeftbar(false));
+      // }
+    };
+    window.addEventListener("resize", handleResize);
 
-    return () =>
-      window.removeEventListener("resize", () => setIsOpenLeftbar(false));
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const handleTranslate = () => {
-    leftbarRef.current.style.transform = "translateX(-150%)";
-  };
+
 
   const handleOnBlur = () => {
-    isOpenLeftbar && handleTranslate();
-    setTimeout(() => {
-      setIsOpenLeftbar(false);
-    }, 30);
+    // dispatch(setOpenLeftbar());
+    //   handleTranslate();
+    //   setTimeout(() => {
+    //     dispatch(setOpenLeftbar(false));
+    //   }, 30);
   };
+  const handleMenu = () => {};
   return (
     <div
       className="leftbar"
       ref={leftbarRef}
       tabIndex={1}
-      // style={{
-      //   transform: isOpenLeftbar && "translateX(0)",
-      // }}
-      onFocus={(e) => {
-        leftbarRef.current.style.transform = "translateX(0)";
+      style={{
+        transform:
+          (isOpenLeftbar && isSmallScreen) || isBigScreen
+            ? // (!isBigScreen && isOpenLeftbar)
+              "translateX(0)"
+            : "translateX(-150%)",
       }}
+      // onFocus={(e) => {
+      //   leftbarRef.current.style.transform = "translateX(0)";
+      // }}
       onBlur={handleOnBlur}
     >
       <div className="container">
         <div className="menu">
           <div className="user">
-            <img src={currentUser.profilePicture} alt="" />
+            <img src={currentUser.profilePic} alt="" />
             <span>{currentUser.name}</span>
           </div>
           <div className="item">

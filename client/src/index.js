@@ -4,14 +4,16 @@ import App from "./App";
 import { AuthContextProvider } from "./context/authContext";
 import { DarkModeContextProvider } from "./context/darkModeContext";
 import "./index.css";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
     <DarkModeContextProvider>
       <AuthContextProvider>
-        <App />
+        <Provider store={store}>
+          <App />
+        </Provider>
       </AuthContextProvider>
     </DarkModeContextProvider>
-  </React.StrictMode>
 );

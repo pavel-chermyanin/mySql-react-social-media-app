@@ -13,17 +13,28 @@ import { DarkModeContext } from "../../context/darkModeContext";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../../context/authContext";
 import { useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { toggle2 } from "../../store/darkModeSlice";
+import { setOpenLeftbar } from "../../store/openLeftbar";
 
 const Navbar = () => {
-  const { darkMode, toggle } = useContext(DarkModeContext);
-  const { currentUser, isOpenLeftbar, setIsOpenLeftbar } =
-    useContext(AuthContext);
-
+  // const { darkMode, toggle } = useContext(DarkModeContext);
+  const darkMode = useSelector((state) => state.darkMode.isDarkMode);
+  const { isOpenLeftBar } = useSelector(
+    (state) => state.openLeftbar
+  );
+  const dispatch = useDispatch();
+  const { currentUser } = useContext(AuthContext);
+  // , isOpenLeftbar, setIsOpenLeftbar
   const [isDropMenu, setDropMenu] = useState(false);
   const [isSearchMobile, setSearchMobile] = useState(false);
   const searchRef = useRef();
   const dropMenuRef = useRef();
   const activeDrop = useRef();
+
+  // const darkMode = useSelector((state) => state.darkMode.isDarkMode);
+
+  // console.log(darkMode);
 
   useEffect(() => {
     window.addEventListener("resize", () => setDropMenu(false));
@@ -33,6 +44,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleMenuDrop = (e) => {
+      e.preventDefault();
       if (
         !activeDrop?.current?.contains(e.target) &&
         !dropMenuRef?.current?.contains(e.target)
@@ -63,18 +75,22 @@ const Navbar = () => {
             <div className="burger">
               <MenuOpenOutlinedIcon
                 onClick={(e) => {
-                  // e.stopPropagation();
-                  setIsOpenLeftbar((prev) => !prev);
+                  e.stopPropagation();
+                  dispatch(setOpenLeftbar())
                 }}
               />
             </div>
             <HomeOutlinedIcon />
             {darkMode ? (
-              <WbSunnyOutlinedIcon onClick={toggle} />
+              <WbSunnyOutlinedIcon onClick={() => {}} />
             ) : (
-              <DarkModeOutlinedIcon onClick={toggle} />
+              <DarkModeOutlinedIcon onClick={() => {}} />
             )}
-            <GridViewOutlinedIcon />
+            <GridViewOutlinedIcon
+              onClick={() => {
+                dispatch(toggle2());
+              }}
+            />
           </>
         )}
 
@@ -118,19 +134,11 @@ const Navbar = () => {
           }}
           ref={activeDrop}
         >
-          <img src={currentUser.profilePicture} alt="" />
+          <img src={currentUser.profilePic} alt="" />
           <span>{currentUser.name}</span>
 
           {isDropMenu && (
-            <div
-              className="mobile-menu"
-              tabIndex={1}
-              ref={dropMenuRef}
-              // onFocus={() => {
-              //   setDropMenu(true);
-              // }}
-              // onBlur={() => setDropMenu(false)}
-            >
+            <div className="mobile-menu" tabIndex={1} ref={dropMenuRef}>
               <div className="mobile-menu__item">
                 <NotificationsOutlinedIcon />
                 <span>Notifications</span>

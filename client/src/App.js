@@ -8,33 +8,43 @@ import { Outlet, Navigate } from "react-router-dom";
 import Home from "./pages/home/Home";
 import Profile from "./pages/profile/Profile";
 import "./app.scss";
-import { useContext, useEffect } from "react";
+import { memo, useContext, useEffect } from "react";
 import { DarkModeContext } from "./context/darkModeContext";
 import { AuthContext } from "./context/authContext";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useSelector } from "react-redux";
 
-function App() {
+const App = memo(() => {
   useEffect(() => {
     localStorage.removeItem("scroll");
   }, []);
 
+  const queryClient = new QueryClient();
   const { currentUser } = useContext(AuthContext);
 
-  const { darkMode, toggle } = useContext(DarkModeContext);
+  // const { darkMode, toggle } = useContext(DarkModeContext);
+  const darkMode = useSelector((state) => state.darkMode.isDarkMode);
 
-  const Layout = () => {
+  const Layout = memo(() => {
     return (
-      <div className={`theme-${darkMode ? "dark" : "light"}`}>
-        <Navbar />
-        <div style={{ display: "flex" }}>
-          <Leftbar />
-          <div style={{ flex: 6 }}>
-            <Outlet />
+      <QueryClientProvider client={queryClient}>
+        <div className={`theme-${darkMode ? "dark" : "light"}`}>
+        {/* <div> */}
+          
+          <Navbar />
+          <div style={{ display: "flex" }}>
+            <Leftbar />
+            <div style={{ flex: 6 }}>
+              <Outlet />
+            </div>
+            <Rightbar />
           </div>
-          <Rightbar />
         </div>
-      </div>
+      </QueryClientProvider>
     );
-  };
+  });
+
+
 
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {
@@ -77,6 +87,6 @@ function App() {
       <RouterProvider router={router} />
     </div>
   );
-}
+});
 
 export default App;

@@ -1,33 +1,49 @@
-import './posts.scss'
-import Post from '../post/Post'
+import "./posts.scss";
+import Post from "../post/Post";
+import { useQuery } from "@tanstack/react-query";
+import { makeRequest } from "../../axios";
+import { memo, useCallback, useEffect } from "react";
+import { fetchPosts } from "../../store/postsSlice";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
+import { createSelector } from "@reduxjs/toolkit";
 
-const Posts = () => {
-    const posts = [
-      {
-        id: 1,
-        name: "John Doe",
-        userId: 1,
-        profilePic:
-          "https://avatars.mds.yandex.net/i?id=e6b17b4ac490ae7819a2b5957a89d5e5-5305537-images-thumbs&n=13",
-        desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit",
-        img: "https://avatars.mds.yandex.net/i?id=14511f9c658b5f8c58ed58eac2e2894f-5232046-images-thumbs&n=13",
-      },
-      {
-        id: 2,
-        name: "Jane Doe",
-        userId: 2,
-        profilePic:
-          "https://avatars.mds.yandex.net/i?id=98ac4d87dd91c389557ed01bffc58ecb-4350294-images-thumbs&n=13",
-        desc: "Tenetur iste voluptates dolorem rem commodi voluptate pariatur, voluptatum, laboriosam consequatur enim nostrum cumque! Maiores a nam non adipisci minima modi tempore.",
-      },
-    ];
+const Posts = memo(() => {
+  const dispatch = useDispatch();
+
+const customEqual = (oldValue, newValue) => oldValue.id === newValue.id;
+  const { posts, isLoadingPosts } = useSelector(
+    (state) => state.posts,
+    customEqual
+  );
+
+  const getPosts = async () => {
+    const { data } = await makeRequest.get("/posts");
+    return data;
+  };
+  // const { isLoading, error, data } = useQuery(["posts"], getPosts, {
+  //   refetchOnWindowFocus: false,
+  // });
+
+  const fetchPostsMemo = useCallback(() => {
+    dispatch(fetchPosts());
+
+  })
+  useEffect(() => {
+    fetchPostsMemo();
+  }, [dispatch]);
+  // console.log(data);
   return (
-    <div className='posts'>
-      {posts.map(post=> (
-        <Post post={post} key={post.id}/>
+    <div className="posts">
+      {/* {error
+        ? "Something went wrong"
+        : isLoading
+        ? "loading"
+        : data.map((post) => <Post post={post} key={post.id} />)} */}
+      {posts.map((post) => (
+        <Post post={post} key={post.id} />
       ))}
     </div>
-  )
-}
+  );
+});
 
-export default Posts
+export default Posts;
