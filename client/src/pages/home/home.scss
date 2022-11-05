@@ -3,18 +3,20 @@
 .home {
   @include themify($themes) {
     padding: 20px 70px;
-     height: calc(100vh - 70px);
+    height: calc(100vh - 70px);
     overflow: auto;
 
     background-color: themed("bgSoft");
     color: themed("textColor");
 
-
-     @include mobile{
+    @media (max-width: 768px) {
+      padding: 30px;
+    }
+    @include mobile {
       padding: 10px;
     }
 
-    @media(max-width: 360px) {
+    @media (max-width: 360px) {
       padding: 5px;
     }
   }

@@ -1,9 +1,10 @@
-import { useContext } from "react";
-import { AuthContext } from "../../context/authContext";
 import "./stories.scss";
+import { useDispatch, useSelector } from "react-redux";
+
 
 const Stories = () => {
-const { currentUser } = useContext(AuthContext);
+  const { currentUser } = useSelector((state) => state.user);
+
 
   const stories = [
     {

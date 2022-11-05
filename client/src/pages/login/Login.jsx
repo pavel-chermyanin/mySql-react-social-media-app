@@ -1,11 +1,12 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import "./login.scss";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/authContext";
+import { login } from "../../store/userSlice";
+import { useDispatch } from "react-redux";
 
 const Login = () => {
-  const { login } = useContext(AuthContext);
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const [inputs, setInputs] = useState({
     username: "",
     password: "",
@@ -19,7 +20,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      await login(inputs);
+      dispatch(login(inputs));
       navigate('/');
     } catch (error) {
       setErr(error.response.data);

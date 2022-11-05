@@ -12,69 +12,43 @@ import Messages from "../../assets/10.png";
 import Tutorials from "../../assets/11.png";
 import Courses from "../../assets/12.png";
 import Fund from "../../assets/13.png";
-import { AuthContext } from "../../context/authContext";
-import { useContext, useEffect, useRef } from "react";
+import {  useEffect, useRef } from "react";
 import { setOpenLeftbar } from "../../store/openLeftbar";
 import { useDispatch, useSelector } from "react-redux";
 import { useMediaQuery } from "react-responsive";
 
 const Leftbar = () => {
-  const { currentUser } = useContext(AuthContext);
-  const leftbarRef = useRef();
   const { isOpenLeftbar } = useSelector((state) => state.openLeftbar);
+  const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const leftbarRef = useRef();
 
   const isBigScreen = useMediaQuery({ query: "(min-width: 768px)" });
   const isSmallScreen = useMediaQuery({ query: "(max-width: 767px)" });
 
-  // if (isSmallScreen) {
-  //   dispatch(setOpenLeftbar(false));
-  //   console.log("less 768px");
-  // }
-  // if (isSmallScreen) {
-  //   dispatch(setOpenLeftbar(false));
-  //   console.log("less 768px");
-  // }
-  // console.log(isOpenLeftbar);
-  useEffect(() => {
-    // leftbarRef.current.focus();
-    // dispatch(() => setOpenLeftbar(true));
-    // leftbarRef.current.style.transform = "translateX(-150%)";
-  }, [isOpenLeftbar]);
-
   useEffect(() => {
     const handleClick = (e) => {
-      if (!leftbarRef.current.contains(e.target)) {
+      if (!leftbarRef?.current?.contains(e.target)) {
         dispatch(setOpenLeftbar(false));
       }
     };
     window.addEventListener("click", handleClick);
-    
+
+    if (!isOpenLeftbar) {
+      window.removeEventListener("click", handleClick);
+    }
     return () => window.removeEventListener("click", handleClick);
-  }, []);
-  
+  }, [isOpenLeftbar]);
+
   useEffect(() => {
     const handleResize = (e) => {
-      console.log("!");
-      // if(isOpenLeftbar) {
-        dispatch(setOpenLeftbar(false));
-      // }
+      dispatch(setOpenLeftbar(false));
     };
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-
-
-  const handleOnBlur = () => {
-    // dispatch(setOpenLeftbar());
-    //   handleTranslate();
-    //   setTimeout(() => {
-    //     dispatch(setOpenLeftbar(false));
-    //   }, 30);
-  };
-  const handleMenu = () => {};
   return (
     <div
       className="leftbar"
@@ -83,14 +57,9 @@ const Leftbar = () => {
       style={{
         transform:
           (isOpenLeftbar && isSmallScreen) || isBigScreen
-            ? // (!isBigScreen && isOpenLeftbar)
-              "translateX(0)"
+            ? "translateX(0)"
             : "translateX(-150%)",
       }}
-      // onFocus={(e) => {
-      //   leftbarRef.current.style.transform = "translateX(0)";
-      // }}
-      onBlur={handleOnBlur}
     >
       <div className="container">
         <div className="menu">

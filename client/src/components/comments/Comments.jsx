@@ -1,41 +1,58 @@
-import { useContext } from "react";
 import "./comments.scss";
-import { AuthContext } from "../../context/authContext";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import moment from "moment";
+// import { addComment, fetchComments } from "../../store/commentSlice";
+import { useEffect, useState } from "react";
+import { makeRequest } from "../../axios";
+import {
+  fetchComments,
+  selectComments,
+  addComment,
+} from "../../store/commentSlice";
 
-const Comments = () => {
-  const { currentUser } = useContext(AuthContext);
+const Comments = ({ postId }) => {
+  const [desc, setDesc] = useState("");
+  const [comments, setComments] = useState([]);
+  const [forceUpdate, setForceUpdate] = useState(false);
+  const { currentUser } = useSelector((state) => state.user);
+  // const comments = useSelector(selectComments(postId));
+  const dispatch = useDispatch();
+  // console.log(comments)
   //temp
-  const comments = [
-    {
-      id: 1,
-      desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nequeaspernatur ullam aperiam. Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nequeaspernatur ullam aperiam",
-      name: "John Doe",
-      userId: 1,
-      profilePicture:
-        "https://avatars.mds.yandex.net/i?id=fb102207e31b304d6a3f26b6af09baf4-5869856-images-thumbs&n=13",
-    },
-    {
-      id: 2,
-      desc: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem nequeaspernatur ullam aperiam",
-      name: "Jane Doe",
-      userId: 2,
-      profilePicture:
-        "https://avatars.mds.yandex.net/i?id=df1cac31c4eb54670fcc463c5716b68f-5161002-images-thumbs&n=13",
-    },
-  ];
+  useEffect(() => {
+    const fetchComments = async () => {
+      const { data } = await makeRequest.get("/comments?postId=" + postId);
+      return data;
+    };
+    fetchComments().then((res) => setComments(res));
+    // dispatch(fetchComments(postId));
+  }, [postId, forceUpdate]);
+
+  const handleClick = async (e) => {
+    e.preventDefault();
+    await makeRequest.post("/comments", { desc, postId });
+    setForceUpdate(!forceUpdate);
+    // dispatch(addComment({ desc, postId }));
+    setDesc("");
+  };
 
   return (
     <div className="comments">
       <div className="write">
-        <img src={currentUser.profilePicture} alt="" />
-        <input type="text" placeholder="write a comment" />
-        <button>Send</button>
+        <img src={currentUser.profilePic} alt="" />
+        <input
+          type="text"
+          placeholder="write a comment"
+          value={desc}
+          onChange={(e) => setDesc(e.target.value)}
+        />
+        <button onClick={handleClick}>Send</button>
       </div>
-      {comments.map((comment) => (
-        <div className="comment" key={comment.userId}>
+      {comments.length > 0 && comments.map((comment) => (
+        <div className="comment" key={comment.id}>
           <Link to={`/profile/${comment.userId}`}>
-            <img src={comment.profilePicture} alt="" />
+            <img src={comment.profilePic} alt="" />
           </Link>
           <div className="info">
             <Link to={`/profile/${comment.userId}`}>
@@ -43,7 +60,7 @@ const Comments = () => {
             </Link>
             <p>{comment.desc}</p>
           </div>
-          <span className="date">1 hour ago</span>
+          <span className="date">{moment(comment.createdAt).fromNow()}</span>
         </div>
       ))}
     </div>

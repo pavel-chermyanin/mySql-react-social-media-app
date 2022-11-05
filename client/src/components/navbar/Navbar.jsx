@@ -9,42 +9,32 @@ import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import MenuOpenOutlinedIcon from "@mui/icons-material/MenuOpenOutlined";
 import { Link } from "react-router-dom";
-import { DarkModeContext } from "../../context/darkModeContext";
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../../context/authContext";
+import { useEffect, useState } from "react";
 import { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggle2 } from "../../store/darkModeSlice";
 import { setOpenLeftbar } from "../../store/openLeftbar";
 
 const Navbar = () => {
-  // const { darkMode, toggle } = useContext(DarkModeContext);
   const darkMode = useSelector((state) => state.darkMode.isDarkMode);
-  const { isOpenLeftBar } = useSelector(
-    (state) => state.openLeftbar
-  );
-  const dispatch = useDispatch();
-  const { currentUser } = useContext(AuthContext);
-  // , isOpenLeftbar, setIsOpenLeftbar
+  const { currentUser } = useSelector((state) => state.user);
+
   const [isDropMenu, setDropMenu] = useState(false);
   const [isSearchMobile, setSearchMobile] = useState(false);
+
   const searchRef = useRef();
   const dropMenuRef = useRef();
   const activeDrop = useRef();
-
-  // const darkMode = useSelector((state) => state.darkMode.isDarkMode);
-
-  // console.log(darkMode);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     window.addEventListener("resize", () => setDropMenu(false));
-
     return () => window.removeEventListener("resize", () => setDropMenu(false));
   }, []);
 
   useEffect(() => {
     const handleMenuDrop = (e) => {
-      e.preventDefault();
+      e.stopPropagation();
       if (
         !activeDrop?.current?.contains(e.target) &&
         !dropMenuRef?.current?.contains(e.target)
@@ -76,7 +66,7 @@ const Navbar = () => {
               <MenuOpenOutlinedIcon
                 onClick={(e) => {
                   e.stopPropagation();
-                  dispatch(setOpenLeftbar())
+                  dispatch(setOpenLeftbar());
                 }}
               />
             </div>

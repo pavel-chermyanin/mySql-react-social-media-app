@@ -7,13 +7,26 @@ import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import { Link } from "react-router-dom";
 import Comments from "../comments/Comments";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import moment from "moment";
+import { useDispatch, useSelector } from "react-redux";
+import { makeRequest } from "../../axios";
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
+  const [likes, setLikes] = useState([]);
+  const { currentUser } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    const fetchLikes = async() => {
+      const { data } = await makeRequest.get("/likes?postId=" + post.id);
+      return data;
+    }
+    fetchLikes().then(res => setLikes(res))
+  }, [likes.length])
   //temp
 
-  const liked = false;
+  const liked = true;
 
   return (
     <div className="post">
@@ -27,7 +40,7 @@ const Post = ({ post }) => {
               <Link to={`/profile/${post.userId}`}>
                 <span className="name">{post.name}</span>
               </Link>
-              <span className="date">1 min ago</span>
+              <span className="date">{moment(post.createdAt).fromNow()}</span>
             </div>
           </div>
           <MoreHorizIcon />
@@ -35,12 +48,16 @@ const Post = ({ post }) => {
 
         <div className="content">
           <p>{post.desc}</p>
-          <img src={post.img} alt="" />
+          <img src={`./upload/${post.img}`} alt="" />
         </div>
         <div className="info">
           <div className="item">
-            {liked ? <FavoriteOutlinedIcon /> : <FavoriteBorderOutlinedIcon />}
-            <span>12 likes</span>
+            {likes.includes(currentUser.id) ? (
+              <FavoriteOutlinedIcon style={{ color: "red" }} />
+            ) : (
+              <FavoriteBorderOutlinedIcon />
+            )}
+            <span>{likes.length} likes</span>
           </div>
           <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
             <TextsmsOutlinedIcon />
@@ -52,7 +69,7 @@ const Post = ({ post }) => {
           </div>
         </div>
 
-        {commentOpen && <Comments />}
+        {commentOpen && <Comments postId={post.id} />}
       </div>
     </div>
   );
