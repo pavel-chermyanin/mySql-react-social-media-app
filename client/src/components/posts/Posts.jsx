@@ -5,13 +5,14 @@ import { memo, useEffect } from "react";
 import { fetchPosts } from "../../store/postsSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-const Posts = memo(() => {
+const Posts = ({userId}) => {
   const dispatch = useDispatch();
+  // console.log(userId)
 
   const { posts, isLoadingPosts, error } = useSelector((state) => state.posts);
 
   useEffect(() => {
-    dispatch(fetchPosts());
+    dispatch(fetchPosts(userId));
   }, [dispatch, posts.length]);
 
   return (
@@ -23,6 +24,6 @@ const Posts = memo(() => {
         : posts.map((post,idx) => <Post post={post} key={idx} />)}
     </div>
   );
-});
+};
 
 export default Posts;

@@ -28,6 +28,7 @@ const Leftbar = () => {
 
   useEffect(() => {
     const handleClick = (e) => {
+      // e.stopImmediatePropagation();
       if (!leftbarRef?.current?.contains(e.target)) {
         dispatch(setOpenLeftbar(false));
       }
@@ -38,7 +39,7 @@ const Leftbar = () => {
       window.removeEventListener("click", handleClick);
     }
     return () => window.removeEventListener("click", handleClick);
-  }, [isOpenLeftbar]);
+  }, [isOpenLeftbar, currentUser]);
 
   useEffect(() => {
     const handleResize = (e) => {

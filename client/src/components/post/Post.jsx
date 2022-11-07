@@ -11,22 +11,34 @@ import { useEffect, useState } from "react";
 import moment from "moment";
 import { useDispatch, useSelector } from "react-redux";
 import { makeRequest } from "../../axios";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 
 const Post = ({ post }) => {
   const [commentOpen, setCommentOpen] = useState(false);
-  const [likes, setLikes] = useState([]);
+
+  // const [likes, setLikes] = useState([]);
   const { currentUser } = useSelector((state) => state.user);
+  const { isLoading, error, data } = useQuery(["likes"], () =>
+    makeRequest.get("/likes?postId=" + post.id).then((res) => res.data)
+  );
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const fetchLikes = async() => {
-      const { data } = await makeRequest.get("/likes?postId=" + post.id);
-      return data;
+  const mutation = useMutation(
+    (liked) => {
+      if (liked) return makeRequest.delete("/likes?postId=" + post.id);
+      return makeRequest.post("/likes", { postId: post.id });
+    },
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["likes"]);
+      },
     }
-    fetchLikes().then(res => setLikes(res))
-  }, [likes.length])
-  //temp
+  );
 
-  const liked = true;
+  const handleLike = () => {
+    mutation.mutate(data.includes(currentUser.id));
+  };
 
   return (
     <div className="post">
@@ -52,12 +64,19 @@ const Post = ({ post }) => {
         </div>
         <div className="info">
           <div className="item">
-            {likes.includes(currentUser.id) ? (
-              <FavoriteOutlinedIcon style={{ color: "red" }} />
+            {error ? (
+              "Something went wrong"
+            ) : isLoading ? (
+              "Loading..."
+            ) : data.includes(currentUser.id) ? (
+              <FavoriteOutlinedIcon
+                style={{ color: "red" }}
+                onClick={handleLike}
+              />
             ) : (
-              <FavoriteBorderOutlinedIcon />
+              <FavoriteBorderOutlinedIcon onClick={handleLike} />
             )}
-            <span>{likes.length} likes</span>
+            <span>{data?.length} likes</span>
           </div>
           <div className="item" onClick={() => setCommentOpen(!commentOpen)}>
             <TextsmsOutlinedIcon />

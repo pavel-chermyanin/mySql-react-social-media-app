@@ -1,6 +1,6 @@
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, useNavigate } from "react-router-dom";
 import Navbar from "./components/navbar/Navbar";
 import Leftbar from "./components/leftbar/Leftbar";
 import Rightbar from "./components/rightbar/Rightbar";
@@ -12,12 +12,17 @@ import { memo, useEffect } from "react";
 import { useSelector } from "react-redux";
 
 const App = () => {
+  // const navigate = useNavigate()
   const { currentUser } = useSelector((state) => state.user);
-  useEffect(() => {
-    localStorage.getItem("user");
-  }, [currentUser]);
 
-  const Layout = memo(() => {
+  // let currentUser;
+  // useEffect(() => {
+  //   if(!document.cookie.accessToken) {
+  //     navigate('/login')
+  //   }
+  // }, []);
+
+  const Layout = () => {
     const darkMode = useSelector((state) => state.darkMode.isDarkMode);
     return (
       <div className={`theme-${darkMode ? "dark" : "light"}`}>
@@ -31,7 +36,7 @@ const App = () => {
         </div>
       </div>
     );
-  });
+  };
 
   const ProtectedRoute = ({ children }) => {
     if (!currentUser) {

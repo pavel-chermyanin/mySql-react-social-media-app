@@ -6,6 +6,7 @@ import userRoutes from "./routes/users.js";
 import postRoutes from "./routes/posts.js";
 import likeRoutes from "./routes/likes.js";
 import commentRoutes from "./routes/comments.js";
+import relationshipRoutes from "./routes/relationships.js";
 import multer from "multer";
 const app = express();
 
@@ -43,6 +44,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/likes", likeRoutes);
 app.use("/api/comments", commentRoutes);
+app.use("/api/relationships", relationshipRoutes);
 
 app.listen(8800, () => {
   console.log("API working!");

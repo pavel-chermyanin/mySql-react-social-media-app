@@ -10,30 +10,33 @@ import {
   selectComments,
   addComment,
 } from "../../store/commentSlice";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
 
 const Comments = ({ postId }) => {
   const [desc, setDesc] = useState("");
-  const [comments, setComments] = useState([]);
-  const [forceUpdate, setForceUpdate] = useState(false);
-  const { currentUser } = useSelector((state) => state.user);
-  // const comments = useSelector(selectComments(postId));
-  const dispatch = useDispatch();
-  // console.log(comments)
-  //temp
-  useEffect(() => {
-    const fetchComments = async () => {
-      const { data } = await makeRequest.get("/comments?postId=" + postId);
-      return data;
-    };
-    fetchComments().then((res) => setComments(res));
-    // dispatch(fetchComments(postId));
-  }, [postId, forceUpdate]);
 
-  const handleClick = async (e) => {
+  const { currentUser } = useSelector((state) => state.user);
+
+  const { isLoading, error, data } = useQuery(["comments"], () =>
+    makeRequest.get("/comments?postId=" + postId).then((res) => res.data)
+  );
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation(
+    (newComment) => {
+      return makeRequest.post("/comments", newComment);
+    },
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["comments"]);
+      },
+    }
+  );
+
+  const handleClick = (e) => {
     e.preventDefault();
-    await makeRequest.post("/comments", { desc, postId });
-    setForceUpdate(!forceUpdate);
-    // dispatch(addComment({ desc, postId }));
+    mutation.mutate({ desc, postId });
     setDesc("");
   };
 
@@ -49,20 +52,24 @@ const Comments = ({ postId }) => {
         />
         <button onClick={handleClick}>Send</button>
       </div>
-      {comments.length > 0 && comments.map((comment) => (
-        <div className="comment" key={comment.id}>
-          <Link to={`/profile/${comment.userId}`}>
-            <img src={comment.profilePic} alt="" />
-          </Link>
-          <div className="info">
-            <Link to={`/profile/${comment.userId}`}>
-              <span>{comment.name}</span>
-            </Link>
-            <p>{comment.desc}</p>
-          </div>
-          <span className="date">{moment(comment.createdAt).fromNow()}</span>
-        </div>
-      ))}
+      {isLoading
+        ? "Loading..."
+        : data.map((comment) => (
+            <div className="comment" key={comment.id}>
+              <Link to={`/profile/${comment.userId}`}>
+                <img src={comment.profilePic} alt="" />
+              </Link>
+              <div className="info">
+                <Link to={`/profile/${comment.userId}`}>
+                  <span>{comment.name}</span>
+                </Link>
+                <p>{comment.desc}</p>
+              </div>
+              <span className="date">
+                {moment(comment.createdAt).fromNow()}
+              </span>
+            </div>
+          ))}
     </div>
   );
 };

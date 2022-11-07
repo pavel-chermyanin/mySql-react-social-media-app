@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./profile.scss";
 
 import FacebookTwoToneIcon from "@mui/icons-material/FacebookTwoTone";
@@ -10,64 +10,111 @@ import PlaceIcon from "@mui/icons-material/Place";
 import LanguageIcon from "@mui/icons-material/Language";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import Posts from '../../components/posts/Posts'
+import Posts from "../../components/posts/Posts";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { makeRequest } from "../../axios";
+import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import Update from "../../components/update/Update";
 
 const Profile = () => {
+  const [openUpdate, setOpenUpdate] = useState(false)
+  const { currentUser } = useSelector((state) => state.user);
+  
+  const userId = useLocation().pathname.split("/")[2];
+  const { isLoading, error, data } = useQuery(["user"], () =>
+    makeRequest.get("/users/find/" + userId).then((res) => res.data)
+  );
+  const { isLoading: risLoading, data: relationshipData } = useQuery(
+    ["relationship"],
+    () =>
+      makeRequest
+        .get("/relationships?followedUserId=" + userId)
+        .then((res) => res.data)
+  );
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation(
+    (following) => {
+      if (following) return makeRequest.delete("/relationships?userId=" + userId);
+      return makeRequest.post("/relationships", {userId});
+    },
+    {
+      onSuccess: () => {
+        // Invalidate and refetch
+        queryClient.invalidateQueries(["relationship"]);
+      },
+    }
+  );
+
+  const handleFollow = () => {
+    mutation.mutate(relationshipData.includes(currentUser.id));
+  };
   return (
     <div className="profile">
-      <div className="images">
-        <img
-          src="https://avatars.mds.yandex.net/i?id=db2133ddf14c0cd5706f5aa7fd28757b-4456735-images-thumbs&n=13"
-          alt=""
-          className="cover"
-        />
-        <img
-          src="https://avatars.mds.yandex.net/i?id=d7401eceeae47bec10e3cf6fad91da29-3751006-images-thumbs&n=13"
-          alt=""
-          className="profilePic"
-        />
-      </div>
-      <div className="profileContainer">
-        <div className="uInfo">
-          <div className="left">
-            <a href="http://facebook.com">
-              <FacebookTwoToneIcon fontSize="small" />
-            </a>
-            <a href="http://facebook.com">
-              <InstagramIcon fontSize="small" />
-            </a>
-            <a href="http://facebook.com">
-              <TwitterIcon fontSize="small" />
-            </a>
-            <a href="http://facebook.com">
-              <LinkedInIcon fontSize="small" />
-            </a>
-            <a href="http://facebook.com">
-              <PinterestIcon fontSize="small" />
-            </a>
+      {isLoading ? (
+        "Loading..."
+      ) : (
+        <>
+          <div className="images">
+            <img src={data.coverPic} alt="" className="cover" />
+            <img src={data.profilePic} alt="" className="profilePic" />
           </div>
-          <div className="center">
-            <span>Jane Doe</span>
-            <div className="info">
-              <div className="item">
-                <PlaceIcon />
-                <span>USA</span>
+
+          <div className="profileContainer">
+            <div className="uInfo">
+              <div className="left">
+                <a href="http://facebook.com">
+                  <FacebookTwoToneIcon fontSize="small" />
+                </a>
+                <a href="http://facebook.com">
+                  <InstagramIcon fontSize="small" />
+                </a>
+                <a href="http://facebook.com">
+                  <TwitterIcon fontSize="small" />
+                </a>
+                <a href="http://facebook.com">
+                  <LinkedInIcon fontSize="small" />
+                </a>
+                <a href="http://facebook.com">
+                  <PinterestIcon fontSize="small" />
+                </a>
               </div>
-              <div className="item">
-                <LanguageIcon />
-                <span>pavel.dev</span>
+              <div className="center">
+                <span>{data.name}</span>
+                <div className="info">
+                  <div className="item">
+                    <PlaceIcon />
+                    <span>{data.city}</span>
+                  </div>
+                  <div className="item">
+                    <LanguageIcon />
+                    <span>{data.website}</span>
+                  </div>
+                </div>
+                {risLoading ? (
+                  "Loading..."
+                ) : Number(userId) === currentUser.id ? (
+                  <button onClick={() => setOpenUpdate(true)}>update</button>
+                ) : (
+                  <button onClick={handleFollow}>
+                    {relationshipData.includes(currentUser.id)
+                      ? "Following"
+                      : "Follow"}
+                  </button>
+                )}
+              </div>
+              <div className="right">
+                <EmailOutlinedIcon />
+                <MoreVertIcon />
               </div>
             </div>
-            <button>follow</button>
+            <Posts userId={userId} />
           </div>
-          <div className="right">
-            <EmailOutlinedIcon />
-            <MoreVertIcon />
-          </div>
-        </div>
-      <Posts/>
-      </div>
-
+        </>
+      )}
+      {openUpdate && <Update setOpenUpdate={setOpenUpdate} user={data}/>}
     </div>
   );
 };
